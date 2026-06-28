@@ -10,9 +10,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Trash2, UserCircle2 } from "lucide-react";
+import { ArrowLeft, KeyRound, Plus, Trash2, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { SURAHS } from "@/lib/quran-surahs";
+import { StudentCharts } from "@/components/student-charts";
 
 export const Route = createFileRoute("/_authenticated/students/$id")({
   component: StudentDetail,
@@ -22,6 +23,8 @@ function StudentDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const [accessOpen, setAccessOpen] = useState(false);
+  const [accessEmail, setAccessEmail] = useState("");
 
   const { data: student } = useQuery({
     queryKey: ["student", id],
@@ -30,6 +33,23 @@ function StudentDetail() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const setAccess = useMutation({
+    mutationFn: async (email: string) => {
+      const value = email.trim().toLowerCase() || null;
+      const { error } = await supabase
+        .from("students")
+        .update({ linked_email: value, ...(value ? {} : { linked_user_id: null }) })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Accès mis à jour");
+      setAccessOpen(false);
+      qc.invalidateQueries({ queryKey: ["student", id] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
   });
 
   const deleteStudent = useMutation({
@@ -74,6 +94,51 @@ function StudentDetail() {
         >
           <Trash2 className="h-4 w-4 mr-1" /> Supprimer
         </Button>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-border bg-card p-4 flex flex-wrap items-center justify-between gap-3 shadow-[var(--shadow-soft)]">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-full bg-secondary text-primary flex items-center justify-center">
+            <KeyRound className="h-4 w-4" />
+          </div>
+          <div className="text-sm">
+            <div className="font-medium">Accès élève</div>
+            <div className="text-muted-foreground text-xs">
+              {student.linked_user_id
+                ? `Compte lié · ${student.linked_email ?? ""}`
+                : student.linked_email
+                  ? `En attente d'inscription · ${student.linked_email}`
+                  : "Aucun accès. Donnez l'email de l'élève pour qu'il puisse consulter sa progression."}
+            </div>
+          </div>
+        </div>
+        <Dialog open={accessOpen} onOpenChange={(o) => { setAccessOpen(o); if (o) setAccessEmail(student.linked_email ?? ""); }}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">{student.linked_email ? "Modifier l'accès" : "Donner accès"}</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Accès à l'espace élève</DialogTitle></DialogHeader>
+            <form onSubmit={(e) => { e.preventDefault(); setAccess.mutate(accessEmail); }} className="space-y-4 mt-2">
+              <p className="text-sm text-muted-foreground">
+                Saisissez l'email de l'élève (ou de son parent). Lorsqu'il créera son compte avec cet email sur la page de connexion, il verra automatiquement sa progression dans « Ma progression ».
+              </p>
+              <div>
+                <Label htmlFor="access-email">Email</Label>
+                <Input id="access-email" type="email" value={accessEmail} onChange={(e) => setAccessEmail(e.target.value)} placeholder="eleve@email.com" />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" disabled={setAccess.isPending} className="flex-1">Enregistrer</Button>
+                {student.linked_email && (
+                  <Button type="button" variant="outline" onClick={() => setAccess.mutate("")}>Retirer l'accès</Button>
+                )}
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="mb-6">
+        <StudentCharts studentId={id} />
       </div>
 
       <Tabs defaultValue="memorization">

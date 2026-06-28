@@ -212,6 +212,7 @@ export type Database = {
           full_name: string
           id: string
           level: string | null
+          linked_email: string | null
           linked_user_id: string | null
           notes: string | null
           teacher_id: string
@@ -222,6 +223,7 @@ export type Database = {
           full_name: string
           id?: string
           level?: string | null
+          linked_email?: string | null
           linked_user_id?: string | null
           notes?: string | null
           teacher_id: string
@@ -232,6 +234,7 @@ export type Database = {
           full_name?: string
           id?: string
           level?: string | null
+          linked_email?: string | null
           linked_user_id?: string | null
           notes?: string | null
           teacher_id?: string
