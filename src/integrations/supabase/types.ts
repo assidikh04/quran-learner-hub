@@ -14,16 +14,263 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assignments: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          status: string
+          student_id: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string
+          student_id: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string
+          student_id?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          session_date: string
+          status: string
+          student_id: string
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_date?: string
+          status: string
+          student_id: string
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_date?: string
+          status?: string
+          student_id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluations: {
+        Row: {
+          created_at: string
+          eval_date: string
+          eval_type: string
+          id: string
+          notes: string | null
+          score: number | null
+          student_id: string
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          eval_date?: string
+          eval_type: string
+          id?: string
+          notes?: string | null
+          score?: number | null
+          student_id: string
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          eval_date?: string
+          eval_type?: string
+          id?: string
+          notes?: string | null
+          score?: number | null
+          student_id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluations_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memorization: {
+        Row: {
+          created_at: string
+          date_completed: string | null
+          date_started: string | null
+          id: string
+          notes: string | null
+          status: string
+          student_id: string
+          surah_name: string
+          surah_number: number
+          teacher_id: string
+          verse_from: number | null
+          verse_to: number | null
+        }
+        Insert: {
+          created_at?: string
+          date_completed?: string | null
+          date_started?: string | null
+          id?: string
+          notes?: string | null
+          status: string
+          student_id: string
+          surah_name: string
+          surah_number: number
+          teacher_id: string
+          verse_from?: number | null
+          verse_to?: number | null
+        }
+        Update: {
+          created_at?: string
+          date_completed?: string | null
+          date_started?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          student_id?: string
+          surah_name?: string
+          surah_number?: number
+          teacher_id?: string
+          verse_from?: number | null
+          verse_to?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memorization_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          age: number | null
+          created_at: string
+          full_name: string
+          id: string
+          level: string | null
+          linked_user_id: string | null
+          notes: string | null
+          teacher_id: string
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          full_name: string
+          id?: string
+          level?: string | null
+          linked_user_id?: string | null
+          notes?: string | null
+          teacher_id: string
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          level?: string | null
+          linked_user_id?: string | null
+          notes?: string | null
+          teacher_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "teacher" | "parent" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +397,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["teacher", "parent", "student"],
+    },
   },
 } as const
