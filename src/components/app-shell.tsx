@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, LineChart } from "lucide-react";
 import { Toaster } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -25,6 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const nav = [
     { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
     { to: "/students", label: "Élèves", icon: Users },
+    { to: "/my-progress", label: "Ma progression", icon: LineChart },
   ];
 
   return (
