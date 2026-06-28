@@ -77,14 +77,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Tilāwa — Suivi des élèves du Coran" },
+      { name: "description", content: "Application de suivi pour enseignants du Coran : mémorisation, présence, évaluations et devoirs." },
+      { property: "og:title", content: "Tilāwa — Suivi des élèves du Coran" },
+      { property: "og:description", content: "Suivez la mémorisation, l'assiduité et la progression de vos élèves." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
