@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { BookOpen, CalendarCheck, GraduationCap, ClipboardList } from "lucide-react";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,6 +17,23 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const route = async (userId: string) => {
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+      const isStaff = roles?.some((r) => r.role === "admin" || r.role === "teacher");
+      navigate({ to: isStaff ? "/dashboard" : "/my-progress", replace: true });
+    };
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) route(data.session.user.id);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session?.user) route(session.user.id);
+    });
+    return () => sub.subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const features = [
     { icon: BookOpen, title: "Mémorisation", ar: "الحفظ", desc: "Suivez les sourates apprises, en cours et à réviser pour chaque élève." },
     { icon: CalendarCheck, title: "Présence", ar: "الحضور", desc: "Marquez l'assiduité à chaque séance et visualisez les tendances." },
